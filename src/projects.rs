@@ -1,3 +1,4 @@
+use crate::contribution::Contribution;
 use chrono::{prelude::*, Duration};
 use std::ops::Add;
 
@@ -188,22 +189,25 @@ impl Project {
     pub fn value(self) -> u32 {
         self.approx_value
     }
+}
 
+impl Contribution for Project {
     /// Returns the contribution for a given month.
     ///
     /// ### Example
     /// ```
     /// use chrono::{prelude::*, Duration};
     /// use allokator::projects::Project;    
+    /// use allokator::contribution::Contribution;
     ///
     /// let name = String::from("My Project");
     /// let start = Utc.ymd(2014, 7, 8);
     /// let duration = Duration::weeks(2);
     /// let approx_value: u32 = 20000;
     /// let p = Project::new(name, approx_value, start, &duration);
-    /// p.get_contribution_at(Utc.ymd(2014, 7, 8));
+    /// p.get_contribution_on(Utc.ymd(2014, 7, 8));
     /// ```    
-    pub fn get_contribution_at(self, date: Date<Utc>) -> i32 {
+    fn get_contribution_on(self, date: Date<Utc>) -> i32 {
         let before_start = self.start_date >= date;
         let after_end = self.end_date > date;
         match before_start || after_end {
@@ -226,7 +230,7 @@ mod tests {
         let approx_value: u32 = 20000;
         let p = Project::new(name, approx_value, start, &duration);
         let during = start + Duration::weeks(1);
-        let contribution = p.get_contribution_at(during);
+        let contribution = p.get_contribution_on(during);
         assert!(contribution >= 0);
         assert!(contribution <= approx_value as i32)
     }
@@ -238,7 +242,7 @@ mod tests {
         let duration = Duration::weeks(2);
         let approx_value: u32 = 20000;
         let p = Project::new(name, approx_value, start, &duration);
-        let contribution = p.get_contribution_at(Utc.ymd(2014, 7, 8));
+        let contribution = p.get_contribution_on(Utc.ymd(2014, 7, 8));
         assert_eq!(contribution, 0)
     }
 
@@ -249,7 +253,7 @@ mod tests {
         let duration = Duration::weeks(2);
         let approx_value: u32 = 20000;
         let p = Project::new(name, approx_value, start, &duration);
-        let contribution = p.get_contribution_at(Utc.ymd(2024, 7, 8));
+        let contribution = p.get_contribution_on(Utc.ymd(2024, 7, 8));
         assert_eq!(contribution, 0)
     }
 }

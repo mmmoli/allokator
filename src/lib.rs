@@ -1,3 +1,4 @@
+pub mod contribution;
 pub mod projects;
 
 #[cfg(test)]
