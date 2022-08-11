@@ -62,7 +62,7 @@ impl ProjectBuilder {
     /// let project = ProjectBuilder::new()
     ///   .duration(duration)
     ///   .build();
-    /// assert_eq!(project.approx_duration(), duration)
+    /// assert_eq!(project.duration(), duration)
     /// ```
     pub fn duration(mut self, duration: Duration) -> ProjectBuilder {
         self.duration = duration;
@@ -80,7 +80,7 @@ impl ProjectBuilder {
     /// let project = ProjectBuilder::new()
     ///   .start_date(start)
     ///   .build();
-    /// assert_eq!(project.approx_start_date, start)
+    /// assert_eq!(project.start_date, start)
     /// ```
     pub fn start_date(mut self, date: Date<Utc>) -> ProjectBuilder {
         self.start_date = date;
@@ -89,8 +89,8 @@ impl ProjectBuilder {
 
     pub fn build(self) -> Project {
         Project {
-            approx_end_date: self.start_date + self.duration,
-            approx_start_date: self.start_date,
+            end_date: self.start_date + self.duration,
+            start_date: self.start_date,
             approx_value: self.value,
             name: self.name,
         }
@@ -102,8 +102,8 @@ impl ProjectBuilder {
 /// Note: all values are designed to be approximate.
 #[derive(PartialEq, Debug)]
 pub struct Project {
-    pub approx_end_date: Date<Utc>,
-    pub approx_start_date: Date<Utc>,
+    pub end_date: Date<Utc>,
+    pub start_date: Date<Utc>,
     pub name: String,
     approx_value: u32,
 }
@@ -116,8 +116,8 @@ impl Default for Project {
         let end = start + Duration::weeks(4);
 
         Project {
-            approx_end_date: end,
-            approx_start_date: start.into(),
+            end_date: end,
+            start_date: start.into(),
             approx_value: 20000,
             name: "New Project".into(),
         }
@@ -146,8 +146,8 @@ impl Project {
     ) -> Project {
         let approx_end_date = approx_start_date.add(*duration);
         Project {
-            approx_end_date,
-            approx_start_date,
+            end_date: approx_end_date,
+            start_date: approx_start_date,
             approx_value,
             name,
         }
@@ -165,10 +165,10 @@ impl Project {
     /// let duration = Duration::weeks(2);
     /// let approx_value: u32 = 20000;
     /// let p = Project::new(name, approx_value, start, &duration);
-    /// assert_eq!(p.approx_duration(), duration)
+    /// assert_eq!(p.duration(), duration)
     /// ```
-    pub fn approx_duration(self) -> Duration {
-        self.approx_end_date - self.approx_start_date
+    pub fn duration(self) -> Duration {
+        self.end_date - self.start_date
     }
 
     /// Returns the Project's approximate value.
@@ -183,9 +183,9 @@ impl Project {
     /// let duration = Duration::weeks(2);
     /// let approx_value: u32 = 20000;
     /// let p = Project::new(name, approx_value, start, &duration);
-    /// assert_eq!(p.approx_value(), approx_value)
+    /// assert_eq!(p.value(), approx_value)
     /// ```
-    pub fn approx_value(self) -> u32 {
+    pub fn value(self) -> u32 {
         self.approx_value
     }
 
@@ -204,8 +204,8 @@ impl Project {
     /// p.get_contribution_at(Utc.ymd(2014, 7, 8));
     /// ```    
     pub fn get_contribution_at(self, date: Date<Utc>) -> i32 {
-        let before_start = self.approx_start_date >= date;
-        let after_end = self.approx_end_date > date;
+        let before_start = self.start_date >= date;
+        let after_end = self.end_date > date;
         match before_start || after_end {
             true => 0,
             false => 0,
