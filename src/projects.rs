@@ -1,6 +1,20 @@
 use chrono::{prelude::*, Duration};
 use std::ops::Add;
 
+#[derive(PartialEq, Debug)]
+pub enum ProjectBuilderError {
+    ZeroLengthDuration,
+}
+
+impl std::error::Error for ProjectBuilderError {}
+impl std::fmt::Display for ProjectBuilderError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            ProjectBuilderError::ZeroLengthDuration => write!(f, "Project has no duration."),
+        }
+    }
+}
+
 /// # ProjectBuilder
 /// Constructs Projects.
 #[derive(PartialEq, Debug)]
@@ -52,6 +66,24 @@ impl ProjectBuilder {
     /// ```
     pub fn duration(mut self, duration: Duration) -> ProjectBuilder {
         self.duration = duration;
+        self
+    }
+
+    /// This method sets the project's start date.
+    ///
+    /// ## Example
+    /// ```
+    /// use allokator::projects::ProjectBuilder;
+    /// use chrono::prelude::*;
+    ///
+    /// let start = Utc.ymd(2014, 7, 8);
+    /// let project = ProjectBuilder::new()
+    ///   .start_date(start)
+    ///   .build();
+    /// assert_eq!(project.approx_start_date, start)
+    /// ```
+    pub fn start_date(mut self, date: Date<Utc>) -> ProjectBuilder {
+        self.start_date = date;
         self
     }
 
