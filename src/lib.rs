@@ -1,5 +1,6 @@
 pub mod contribution;
 pub mod projects;
+pub mod resources;
 
 #[cfg(test)]
 mod tests {
