@@ -1,6 +1,7 @@
-pub mod contribution;
+pub mod allocations;
 pub mod projects;
-pub mod resources;
+pub mod teams;
+pub mod traits;
 
 #[cfg(test)]
 mod tests {
