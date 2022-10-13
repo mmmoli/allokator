@@ -1,13 +1,13 @@
-use crate::resources::Resource;
+use crate::metrics::Revenue;
 use chrono::{prelude::*, Duration};
 use std::ops::Add;
 
-#[derive(PartialEq, Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Timeline {
     pub name: String,
     pub start_date: NaiveDate,
     pub duration: Duration,
-    pub resources: Vec<Resource>,
+    pub metric: Revenue,
 }
 
 impl Timeline {
@@ -43,7 +43,7 @@ impl TimelineBuilder {
             name: self.name,
             start_date: self.start_date,
             duration: self.duration,
-            resources: vec![],
+            metric: Revenue { value: 2000 },
         }
     }
 
@@ -79,7 +79,7 @@ mod tests {
             name: "test".to_string(),
             start_date: NaiveDate::from_ymd(2022, 1, 1),
             duration: Duration::weeks(6),
-            resources: vec![],
+            metric: Revenue { value: 0 },
         };
         assert_eq!(t1.name, "test");
     }
@@ -90,7 +90,7 @@ mod tests {
             name: "test".to_string(),
             start_date: NaiveDate::from_ymd(2022, 1, 1),
             duration: Duration::weeks(1),
-            resources: vec![],
+            metric: Revenue { value: 0 },
         };
         assert_eq!(t.end_date(), NaiveDate::from_ymd(2022, 1, 8));
     }
@@ -101,7 +101,7 @@ mod tests {
             name: "New Timeline".to_string(),
             start_date: NaiveDate::default(),
             duration: Duration::weeks(4),
-            resources: vec![],
+            metric: Revenue { value: 2000 },
         };
         let t_from_builder = TimelineBuilder::new().build();
         assert_eq!(t, t_from_builder);

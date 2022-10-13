@@ -1,4 +1,4 @@
-pub mod resources;
+pub mod metrics;
 pub mod timelines;
 
 #[cfg(test)]
