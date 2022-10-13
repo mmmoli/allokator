@@ -8,5 +8,6 @@ edition = "2021"
 [dependencies]
 chrono = "0.4.21"
 color-eyre = "0.6.2"
+rand = "0.8.5"
 
 

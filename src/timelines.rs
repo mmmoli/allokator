@@ -1,6 +1,7 @@
 use crate::metrics::Revenue;
 use chrono::{prelude::*, Duration};
-use std::ops::Add;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Timeline {
@@ -10,16 +11,31 @@ pub struct Timeline {
     pub metric: Revenue,
 }
 
+impl Default for Timeline {
+    fn default() -> Self {
+        Self {
+            name: String::from("New Timeline"),
+            start_date: NaiveDate::default(),
+            duration: Duration::weeks(4),
+            metric: Revenue { value: 10000 },
+        }
+    }
+}
+
 impl Timeline {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Creates a [`TimelineBuilder`] for a [`Timeline`].
-    pub fn builder() -> TimelineBuilder {
-        TimelineBuilder::new()
+    pub fn builder(name: &str) -> TimelineBuilder {
+        TimelineBuilder::new(name)
     }
 
     /// Returns the end date of this [`Timeline`].
     #[allow(dead_code)]
     pub fn end_date(&self) -> NaiveDate {
-        self.start_date.add(self.duration)
+        std::ops::Add::add(self.start_date, self.duration)
     }
 
     /// Returns the value of this metric on a given date.
@@ -29,6 +45,27 @@ impl Timeline {
             true => self.metric.value,
             false => 0,
         }
+    }
+
+    /// Returns a random variable within error bounds of this metric on a given date.
+    pub fn roll(&self) -> (u32, NaiveDate) {
+        let mut rng = rand::thread_rng();
+        let half_date_variance = Duration::weeks(4);
+        let min_date = self.start_date - half_date_variance;
+        let max_duration = self.duration + half_date_variance + half_date_variance;
+        let random_date =
+            min_date + Duration::days(rand::random::<i64>() % max_duration.num_days());
+
+        let random_value = {
+            let price_options = [0.0, 0.8, 0.9, 1.0, 1.1];
+
+            match price_options.choose(&mut rng) {
+                Some(multipler) => (self.metric.value as f32 * multipler) as u32,
+                None => self.metric.value,
+            }
+        };
+
+        (random_value, random_date)
     }
 }
 
@@ -40,12 +77,12 @@ pub struct TimelineBuilder {
 }
 
 impl TimelineBuilder {
-    pub fn new() -> TimelineBuilder {
+    pub fn new(name: &str) -> TimelineBuilder {
         TimelineBuilder {
-            name: "New Timeline".to_owned(),
+            name: name.to_owned(),
             start_date: NaiveDate::default(),
             duration: Duration::weeks(4),
-            metric: Revenue { value: 2000 },
+            metric: Revenue { value: 10000 },
         }
     }
 
@@ -81,7 +118,7 @@ impl TimelineBuilder {
 
 impl Default for TimelineBuilder {
     fn default() -> TimelineBuilder {
-        TimelineBuilder::new()
+        TimelineBuilder::new("New Timeline")
     }
 }
 
@@ -114,12 +151,12 @@ mod tests {
     #[test]
     fn builder_test() {
         let t = Timeline {
-            name: "New Timeline".to_string(),
+            name: "My Timeline".to_string(),
             start_date: NaiveDate::default(),
             duration: Duration::weeks(4),
-            metric: Revenue { value: 2000 },
+            metric: Revenue { value: 10000 },
         };
-        let t_from_builder = TimelineBuilder::new().build();
+        let t_from_builder = TimelineBuilder::new("My Timeline").build();
         assert_eq!(t, t_from_builder);
     }
 
@@ -129,12 +166,12 @@ mod tests {
             name: "New Timeline".to_string(),
             start_date: NaiveDate::from_ymd(2022, 1, 2),
             duration: Duration::weeks(4),
-            metric: Revenue { value: 2000 },
+            metric: Revenue { value: 10000 },
         };
         assert_eq!(t.contribution_on(NaiveDate::from_ymd(2022, 1, 1)), 0);
-        assert_eq!(t.contribution_on(NaiveDate::from_ymd(2022, 1, 2)), 2000);
-        assert_eq!(t.contribution_on(NaiveDate::from_ymd(2022, 1, 3)), 2000);
-        assert_eq!(t.contribution_on(NaiveDate::from_ymd(2022, 1, 30)), 2000);
+        assert_eq!(t.contribution_on(NaiveDate::from_ymd(2022, 1, 2)), 10000);
+        assert_eq!(t.contribution_on(NaiveDate::from_ymd(2022, 1, 3)), 10000);
+        assert_eq!(t.contribution_on(NaiveDate::from_ymd(2022, 1, 30)), 10000);
         assert_eq!(t.contribution_on(NaiveDate::from_ymd(2022, 1, 31)), 0);
         assert_eq!(t.contribution_on(NaiveDate::from_ymd(2022, 2, 1)), 0);
     }
