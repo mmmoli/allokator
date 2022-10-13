@@ -1,7 +1,7 @@
 use chrono::{prelude::*, Duration};
 use std::ops::Add;
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Eq, Debug)]
 pub struct Timeline {
     pub name: String,
     pub start_date: NaiveDate,
@@ -9,7 +9,7 @@ pub struct Timeline {
 }
 
 impl Timeline {
-    /// Creates a builder for a [`Timeline`].
+    /// Creates a [`TimelineBuilder`] for a [`Timeline`].
     pub fn builder() -> TimelineBuilder {
         TimelineBuilder::new()
     }
@@ -49,14 +49,20 @@ impl TimelineBuilder {
         self
     }
 
-    pub fn start_date(mut self, date: &NaiveDate) -> TimelineBuilder {
-        self.start_date = date.clone();
+    pub fn start_date(mut self, date: NaiveDate) -> TimelineBuilder {
+        self.start_date = date;
         self
     }
 
     pub fn weeks(mut self, weeks: u8) -> TimelineBuilder {
         self.duration = Duration::weeks(weeks as i64);
         self
+    }
+}
+
+impl Default for TimelineBuilder {
+    fn default() -> TimelineBuilder {
+        TimelineBuilder::new()
     }
 }
 

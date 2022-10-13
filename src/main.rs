@@ -7,13 +7,13 @@ fn main() -> Result<()> {
 
     let t1: Timeline = Timeline::builder()
         .name("Project 1")
-        .start_date(&NaiveDate::from_ymd(2022, 1, 1))
+        .start_date(NaiveDate::from_ymd(2022, 1, 1))
         .weeks(4)
         .build();
 
     let t2: Timeline = Timeline::builder()
         .name("Project 2")
-        .start_date(&NaiveDate::from_ymd(2022, 5, 20))
+        .start_date(NaiveDate::from_ymd(2022, 5, 20))
         .weeks(4)
         .build();
 
