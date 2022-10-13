@@ -1,7 +1,4 @@
-pub mod allocations;
-pub mod projects;
-pub mod teams;
-pub mod traits;
+pub mod timelines;
 
 #[cfg(test)]
 mod tests {
