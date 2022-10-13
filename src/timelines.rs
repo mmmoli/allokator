@@ -54,8 +54,8 @@ impl TimelineBuilder {
         self
     }
 
-    pub fn duration(mut self, duration: &Duration) -> TimelineBuilder {
-        self.duration = duration.clone();
+    pub fn weeks(mut self, weeks: u8) -> TimelineBuilder {
+        self.duration = Duration::weeks(weeks as i64);
         self
     }
 }
