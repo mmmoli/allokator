@@ -1,3 +1,4 @@
+pub mod resources;
 pub mod timelines;
 
 #[cfg(test)]
